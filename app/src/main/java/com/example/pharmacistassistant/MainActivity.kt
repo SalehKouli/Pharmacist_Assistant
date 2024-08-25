@@ -4,192 +4,86 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import com.example.pharmacistassistant.ui.theme.PharmacistAssistantTheme
+import com.example.pharmacistassistant.utils.AppLogger
+import com.example.pharmacistassistant.viewmodel.ProductViewModel
+import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var scanResultLauncher: ActivityResultLauncher<Intent>
-    private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private val productViewModel: ProductViewModel by viewModels {
+        ProductViewModelFactory(application)
+    }
+
+    private var hasScannedBarcode by mutableStateOf(false)
+    private var scannedBarcode by mutableStateOf("")
+
+    private val scanBarcodeLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        handleScanResult(result)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppLogger.logDebug(this, "onCreate called")
+        AppLogger.logDebug(this, "scannedBarcode: $scannedBarcode")
 
-        var scannedBarcode by mutableStateOf("") // State to hold the scanned barcode result
-
-        // Initialize the launcher to handle the scan result
-        scanResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val barcodeResult = result.data?.getStringExtra("BARCODE_RESULT")
-                barcodeResult?.let {
-                    scannedBarcode = it // Update the state with the scanned barcode
-                }
-            }
-        }
-
-        // Initialize the launcher to request camera permission
-        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                startScanActivity() // Launch the scan activity if the permission is granted
-            } else {
-                AppLogger.logError(this, "Camera permission denied")
-            }
-        }
-
-        // Set the content once and use the state to update the UI
         setContent {
-            MaterialTheme {
+            PharmacistAssistantTheme {
                 MainScreen(
-                    scannedBarcode = scannedBarcode, // Pass the scanned barcode state
-                    onRequestCameraPermission = { requestCameraPermission() }
+                    productViewModel = productViewModel,
+                    scannedBarcode = scannedBarcode,
+                    onScanButtonClick = { checkAndRequestCameraPermission() }
                 )
             }
         }
     }
 
-    private fun requestCameraPermission() {
-        when {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
-                startScanActivity()
+    private fun handleScanResult(result: ActivityResult) {
+        AppLogger.logDebug(this, "handleScanResult called")
+        if (result.resultCode == RESULT_OK) {
+            result.data?.getStringExtra("SCANNED_BARCODE")?.let {
+                scannedBarcode = it
+                hasScannedBarcode = true
+                AppLogger.logDebug(this, "Scanned barcode: $scannedBarcode")
+                // Trigger search with the scanned barcode
+                productViewModel.searchByBarcodeOrTradeName(scannedBarcode)
             }
-            else -> {
-                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-            }
+        } else {
+            hasScannedBarcode = false
+            Toast.makeText(this, R.string.no_scan_result, Toast.LENGTH_SHORT).show()
+            AppLogger.logDebug(this, "No barcode scanned")
         }
     }
 
-    private fun startScanActivity() {
-        val intent = Intent(this, ScanActivity::class.java)
-        scanResultLauncher.launch(intent)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun MainScreen(
-    scannedBarcode: String, // Accept the scanned barcode state
-    onRequestCameraPermission: () -> Unit
-) {
-    val context = LocalContext.current
-    val scannedData = remember { mutableStateListOf<ProductData>() }
-    val allData = remember { readExcelFile(context, "your_excel_file.xlsx") }
-    var query by remember { mutableStateOf(scannedBarcode) } // Initialize with scanned barcode
-    var searchResults by remember { mutableStateOf(listOf<ProductData>()) }
-
-    // Trigger search only when scannedBarcode changes
-    LaunchedEffect(scannedBarcode) {
-        if (scannedBarcode.isNotEmpty()) {
-            query = scannedBarcode
-            searchResults = allData.filter {
-                it.barcode.contains(query, ignoreCase = true) ||
-                        it.tradeName.contains(query, ignoreCase = true)
-            }
+    private fun checkAndRequestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            val intent = Intent(this, ScanActivity::class.java)
+            scanBarcodeLauncher.launch(intent)
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
-    Scaffold(
-        topBar = {
-            Column {
-                TopAppBar(
-                    title = { Text(stringResource(id = R.string.app_name)) },
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            // Implement navigation drawer or menu
-                        }) {
-                            Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { newQuery ->
-                        query = newQuery
-                        searchResults = allData.filter {
-                            it.barcode.contains(query, ignoreCase = true) ||
-                                    it.tradeName.contains(query, ignoreCase = true)
-                        }
-                    },
-                    label = { Text(stringResource(id = R.string.scan_button_text)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                )
-                LazyColumn {
-                    items(searchResults) { result ->
-                        ListItem(
-                            headlineContent = { Text(result.tradeName) },
-                            supportingContent = { Text(result.barcode) },
-                            modifier = Modifier.clickable {
-                                scannedData.add(result)
-                            }
-                        )
-                    }
-                }
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onRequestCameraPermission) {
-                Icon(imageVector = Icons.Filled.Camera, contentDescription = "Scan")
-            }
-        }
-    ) { innerPadding ->
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
-            ScannedDataTable(scannedData)
-        }
-    }
-}
-
-@Composable
-fun ScannedDataTable(scannedData: List<ProductData>) {
-    LazyColumn(modifier = Modifier.padding(16.dp)) {
-        item {
-            // Header row
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Text(text = stringResource(id = R.string.barcode), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.trade_name), modifier = Modifier.weight(2f))
-                Text(text = stringResource(id = R.string.form), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.dosage), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.size), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.factory), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.commons_price), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.quantity_available), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.wholesale_price), modifier = Modifier.weight(1f))
-                Text(text = stringResource(id = R.string.purchase_price), modifier = Modifier.weight(1f))
-            }
-        }
-        items(scannedData) { data ->
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)) {
-                Text(text = data.barcode, modifier = Modifier.weight(1f))
-                Text(text = data.tradeName, modifier = Modifier.weight(2f))
-                Text(text = data.form, modifier = Modifier.weight(1f))
-                Text(text = data.dosage, modifier = Modifier.weight(1f))
-                Text(text = data.size, modifier = Modifier.weight(1f))
-                Text(text = data.factory, modifier = Modifier.weight(1f))
-                Text(text = data.commonsPrice, modifier = Modifier.weight(1f))
-                Text(text = data.quantityAvailable, modifier = Modifier.weight(1f))
-                Text(text = data.wholesalePrice, modifier = Modifier.weight(1f))
-                Text(text = data.purchasePrice, modifier = Modifier.weight(1f))
-            }
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val intent = Intent(this, ScanActivity::class.java)
+            scanBarcodeLauncher.launch(intent)
+        } else {
+            Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show()
         }
     }
 }

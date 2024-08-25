@@ -3,6 +3,7 @@ package com.example.pharmacistassistant
 import android.content.Context
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import java.io.InputStream
+import org.apache.poi.ss.usermodel.CellType
 
 // Data class to hold the product information
 data class ProductData(
@@ -35,7 +36,7 @@ fun readExcelFile(context: Context, fileName: String): List<ProductData> {
         for (row in sheet) {
             if (row.rowNum == 0) continue // Skip the header row
 
-            // Extracting cell data based on new column mapping
+            // Extracting cell data based on the column order
             val purchasePrice = row.getCell(0).toString() // Column A
             val wholesalePrice = row.getCell(1).toString() // Column B
             val quantityAvailable = row.getCell(2).toString() // Column C
@@ -45,7 +46,14 @@ fun readExcelFile(context: Context, fileName: String): List<ProductData> {
             val dosage = row.getCell(6).toString() // Column G
             val form = row.getCell(7).toString() // Column H
             val tradeName = row.getCell(8).toString() // Column I
-            val barcode = row.getCell(9).toString() // Column J
+
+            // Read barcode as a string to prevent scientific notation
+            val barcode = if (row.getCell(9).cellType == CellType.STRING) {
+                row.getCell(9).stringCellValue
+            } else {
+                // Convert numeric value to string without scientific notation
+                row.getCell(9).numericCellValue.toLong().toString() // Convert to Long first to avoid scientific notation
+            }
 
             // Create a ProductData object and add it to the list
             val productData = ProductData(

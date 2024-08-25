@@ -2,33 +2,68 @@
 activityComposeVersion = "1.9.1"
 agp = "8.5.2"
 androidxJunit = "1.2.1"
+androidxMaterial = "1.7.0-rc01"
 appcompat = "1.7.0"
+barcodeScanning = "17.3.0"
+barcodeScanningVersion = "17.3.0"
+cameraCamera2 = "1.3.4"
+cameraCore = "1.3.4"
+cameraView = "1.3.4"
 composeBomVersion = "2024.08.00"
 constraintlayout = "2.1.4"
 core = "3.4.1"
 coreKtxVersion = "1.13.1"
 espressoCoreVersion = "3.6.1"
+foundation = "1.6.8"
+googleBarcodeScanning = "17.3.0"
+hiltNavigationCompose = "1.2.0"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+kotlinxCoroutinesAndroid = "1.7.3"
+kotlinxCoroutinesCore = "1.7.3"
 lifecycleRuntimeKtx = "2.8.4"
 activityCompose = "1.9.1"
 composeBom = "2024.08.00"
 lifecycleRuntimeKtxVersion = "2.8.4"
+lifecycleViewmodelCompose = "2.8.4"
+material3 = "1.2.1"
+material3AdaptiveNavigationSuiteVersion = "1.3.0-rc01"
+material3Version = "1.3.0-rc01"
+material3WindowSizeClass = "1.2.1"
+materialVersion = "1.6.8"
 poi = "5.2.3"
 poiOoxml = "5.2.3"
+runtimeLivedata = "1.6.8"
+ui = "1.6.8"
+uiToolingPreview = "1.6.8"
 zxingAndroidEmbedded = "4.3.0"
 material = "1.12.0"
 activity = "1.9.1"
 zxingAndroidEmbeddedVersion = "4.3.0"
 playServicesAnalyticsImpl = "18.1.0"
 transportApi = "3.2.0"
+lifecycleRuntimeComposeAndroid = "2.8.4"
 
 [libraries]
+androidx-compose-material3-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-compose-material3-material32 = { module = "androidx.compose.material3:material3" }
+androidx-compose-ui-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
+androidx-compose-ui-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+androidx-compose-ui-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+androidx-compose-ui-ui-tooling-preview2 = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-ui-tooling-preview3 = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-compose-ui-ui2 = { module = "androidx.compose.ui:ui" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "foundation" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycleRuntimeKtxVersion" }
 androidx-activity-compose-v191 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCamera2" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCore" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCamera2" }
 androidx-compose-bom-v20240800 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,7 +71,18 @@ androidx-core-ktx-v1131 = { module = "androidx.core:core-ktx", version.ref = "co
 androidx-espresso-core-v361 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
 androidx-junit-v121 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-lifecycle-runtime-ktx-v284 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-material-v170rc01 = { module = "androidx.compose.material:material", version.ref = "androidxMaterial" }
+androidx-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3AdaptiveNavigationSuiteVersion" }
+androidx-material3-v130rc01 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+androidx-material3-window-size = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3WindowSizeClass" }
+androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "runtimeLivedata" }
+barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
+barcode-scanning-v1700 = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanningVersion" }
+barcode-scanning-v1730 = { module = "com.google.mlkit:barcode-scanning", version.ref = "googleBarcodeScanning" }
+camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraView" }
 core = { module = "com.google.zxing:core", version.ref = "core" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -51,10 +97,13 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 material3 = { module = "androidx.compose.material3:material3" }
 poi = { module = "org.apache.poi:poi", version.ref = "poi" }
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poiOoxml" }
 ui = { module = "androidx.compose.ui:ui" }
+ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
@@ -65,6 +114,8 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 zxing-android-embedded-v430 = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbeddedVersion" }
 play-services-analytics-impl = { group = "com.google.android.gms", name = "play-services-analytics-impl", version.ref = "playServicesAnalyticsImpl" }
 transport-api = { group = "com.google.android.datatransport", name = "transport-api", version.ref = "transportApi" }
+androidx-lifecycle-runtime-compose-android = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose-android", version.ref = "lifecycleRuntimeComposeAndroid" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeComposeAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

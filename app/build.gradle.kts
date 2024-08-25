@@ -40,7 +40,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.1" // Use the latest version
     }
     packaging {
         resources {
@@ -50,8 +50,14 @@ android {
 }
 
 dependencies {
-    // ZXing Barcode Scanning library
-    implementation(libs.zxing.android.embedded.v430) // Use a stable version
+    // Google ML Kit Barcode Scanning library
+    implementation(libs.barcode.scanning)
+
+    // CameraX libraries
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.camera.view)
 
     // Core library
     implementation(libs.androidx.core.ktx.v1131)
@@ -73,14 +79,32 @@ dependencies {
     implementation(libs.ui)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.compose.material3.material3)
+    implementation(libs.androidx.compose.ui.ui.tooling.preview)
 
     // Material Icons
     implementation(libs.androidx.material.icons.extended)
-
-    // Apache POI for Excel processing
     implementation(libs.poi.ooxml)
-    implementation(libs.poi)       // Apache POI for Excel files
-    implementation(libs.play.services.analytics.impl) // Apache POI for OOXML files (XLSX)
+    implementation(libs.poi)
+    implementation(libs.play.services.analytics.impl)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.runtime.livedata)
+    implementation (libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.material3)
+    implementation (libs.androidx.material3.v130rc01)
+    implementation(libs.androidx.material.v170rc01)
+    implementation (libs.androidx.material3.window.size)
+    implementation (libs.androidx.material3.adaptive.navigation.suite)
+    implementation (libs.androidx.compose.ui.ui)
+    implementation (libs.androidx.compose.ui.ui.tooling)
+    implementation (libs.ui.graphics)
+    implementation (libs.androidx.compose.ui.ui.tooling.preview2)
+    implementation(libs.androidx.compose.material3.material32)
+    implementation(libs.androidx.compose.ui.ui2)
+    implementation(libs.androidx.compose.ui.ui.tooling.preview3)
+    implementation(libs.androidx.material)
 
     // Testing libraries
     testImplementation(libs.junit)

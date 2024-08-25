@@ -7,10 +7,16 @@
     <string name="dosage">الجرعة</string>
     <string name="size">الحجم</string>
     <string name="factory">المصنع</string>
-    <string name="commons_price">سعر السوق</string>
+    <string name="commons_price">السعر للعموم</string>
     <string name="quantity_available">الكمية المتاحة</string>
     <string name="wholesale_price">سعر الجملة</string>
     <string name="purchase_price">سعر الشراء</string>
     <string name="scan_button_text">مسح الباركود</string>
+    <string name="search"> البحث عن الاسم التجاري أو الباركود </string>
     <string name="scan_failed">فشل المسح</string>
+    <string name="total_commons_price">المبلغ الإجمالي للعموم:</string>
+    <string name="reset_table">مسح الفاتورة</string>
+    <string name="select_columns">فلترة البيانات المعروضة</string>
+    <string name="camera_permission_denied">تم رفض أذونات الكاميرا</string>
+    <string name="open_filters">الفلاتر</string>
 </resources>

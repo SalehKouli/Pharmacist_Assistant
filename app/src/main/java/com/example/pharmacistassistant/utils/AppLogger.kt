@@ -1,4 +1,4 @@
-package com.example.pharmacistassistant
+package com.example.pharmacistassistant.utils
 
 import android.content.Context
 import android.util.Log

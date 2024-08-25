@@ -1,54 +1,105 @@
 package com.example.pharmacistassistant
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.journeyapps.barcodescanner.CaptureActivity
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageProxy
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
+import androidx.core.content.ContextCompat
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class ScanActivity : AppCompatActivity() {
 
+    private var hasScanned = false  // Flag to prevent loop
+    private lateinit var cameraExecutor: ExecutorService
+
+    @ExperimentalGetImage
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        startBarcodeScanner()
-    }
+        setContentView(R.layout.activity_scan) // Make sure you have an appropriate layout
 
-    private fun startBarcodeScanner() {
-        val intent = Intent(this, CaptureActivity::class.java)
-        startActivityForResult(intent, BARCODE_SCANNER_REQUEST_CODE)
-    }
+        hasScanned = savedInstanceState?.getBoolean("hasScanned", false) ?: false
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+        cameraExecutor = Executors.newSingleThreadExecutor()
 
-        if (requestCode == BARCODE_SCANNER_REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK && data != null) {
-                val resultText = data.getStringExtra("SCAN_RESULT")
-                if (resultText != null) {
-                    val resultIntent = Intent().apply {
-                        putExtra("BARCODE_RESULT", resultText)
-                    }
-                    setResult(Activity.RESULT_OK, resultIntent)
-                    finish()  // Finish the activity once the result is set
-                } else {
-                    showToast(getString(R.string.no_scan_result))
-                    finish()  // Finish the activity even if there's no result to avoid looping
-                }
-            } else {
-                showToast(getString(R.string.scan_failed))
-                finish()  // Finish the activity if scan failed
-            }
+        if (!hasScanned) {
+            startCamera()
+        } else {
+            finish()
         }
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    @ExperimentalGetImage
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+            val preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(findViewById<PreviewView>(R.id.previewView).surfaceProvider) // Your layout should include a PreviewView
+            }
+
+            val imageAnalysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+
+            imageAnalysis.setAnalyzer(
+                cameraExecutor
+            ) { imageProxy ->
+                processImage(imageProxy)
+            }
+
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+        }, ContextCompat.getMainExecutor(this))
     }
 
-    companion object {
-        private const val BARCODE_SCANNER_REQUEST_CODE = 1001
+    @ExperimentalGetImage
+    private fun processImage(imageProxy: ImageProxy) {
+        val mediaImage = imageProxy.image
+        if (mediaImage != null) {
+            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+            val scannerOptions = BarcodeScannerOptions.Builder()
+                .setBarcodeFormats(Barcode.FORMAT_ALL_FORMATS)
+                .build()
+            val scanner = BarcodeScanning.getClient(scannerOptions)
+
+            scanner.process(image)
+                .addOnSuccessListener { barcodes ->
+                    for (barcode in barcodes) {
+                        if (!hasScanned) {
+                            val barcodeValue = barcode.rawValue
+                            val intent = Intent().apply {
+                                putExtra("SCANNED_BARCODE", barcodeValue)
+                            }
+                            setResult(RESULT_OK, intent)
+                            finish()
+                            hasScanned = true
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Barcode scanning failed", Toast.LENGTH_SHORT).show()
+                }
+                .addOnCompleteListener {
+                    imageProxy.close()
+                }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("hasScanned", hasScanned)
     }
 }
