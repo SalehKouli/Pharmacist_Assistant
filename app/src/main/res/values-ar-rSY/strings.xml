@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">مساعد الصيدلي</string>
+    <string name="no_scan_result">لا توجد نتيجة مسح</string>
+    <string name="barcode">الباركود</string>
+    <string name="trade_name">الاسم التجاري</string>
+    <string name="form">الشكل</string>
+    <string name="dosage">الجرعة</string>
+    <string name="size">الحجم</string>
+    <string name="factory">المصنع</string>
+    <string name="commons_price">سعر السوق</string>
+    <string name="quantity_available">الكمية المتاحة</string>
+    <string name="wholesale_price">سعر الجملة</string>
+    <string name="purchase_price">سعر الشراء</string>
+    <string name="scan_button_text">مسح الباركود</string>
+    <string name="scan_failed">فشل المسح</string>
+</resources>

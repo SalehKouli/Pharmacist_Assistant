@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Pharmacist Assistant</string>
+    <string name="scan_button_text">Scan</string>
+    <string name="barcode">Barcode</string>
+    <string name="trade_name">Trade Name</string>
+    <string name="form">Form</string>
+    <string name="dosage">Dosage</string>
+    <string name="size">Size</string>
+    <string name="factory">Factory</string>
+    <string name="commons_price">Commons Price</string>
+    <string name="quantity_available">Quantity Available</string>
+    <string name="wholesale_price">Wholesale Price</string>
+    <string name="purchase_price">Purchase Price</string>
+    <string name="no_scan_result">No scan result found</string>
+    <string name="scan_failed">Scan failed</string>
 </resources>

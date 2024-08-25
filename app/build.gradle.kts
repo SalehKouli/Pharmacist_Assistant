@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.pharmacistassistant"
-        minSdk = 21
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -50,20 +50,44 @@ android {
 }
 
 dependencies {
+    // ZXing Barcode Scanning library
+    implementation(libs.zxing.android.embedded.v430) // Use a stable version
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    // Core library
+    implementation(libs.androidx.core.ktx.v1131)
+
+    // AppCompat library
+    implementation(libs.androidx.appcompat)
+
+    // ConstraintLayout library
+    implementation(libs.androidx.constraintlayout)
+
+    // Lifecycle libraries
+    implementation(libs.androidx.lifecycle.runtime.ktx.v284)
+
+    // Activity Compose
+    implementation(libs.androidx.activity.compose.v191)
+
+    // Jetpack Compose libraries
+    implementation(platform(libs.androidx.compose.bom.v20240800))
+    implementation(libs.ui)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+
+    // Material Icons
+    implementation(libs.androidx.material.icons.extended)
+
+    // Apache POI for Excel processing
+    implementation(libs.poi.ooxml)
+    implementation(libs.poi)       // Apache POI for Excel files
+    implementation(libs.play.services.analytics.impl) // Apache POI for OOXML files (XLSX)
+
+    // Testing libraries
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.androidx.junit.v121)
+    androidTestImplementation(libs.androidx.espresso.core.v361)
+    androidTestImplementation(platform(libs.androidx.compose.bom.v20240800))
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
 }
