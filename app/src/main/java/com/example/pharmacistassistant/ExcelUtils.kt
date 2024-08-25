@@ -1,7 +1,6 @@
 package com.example.pharmacistassistant
 
 import android.content.Context
-import org.apache.poi.ss.usermodel.DataFormatter
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import java.io.InputStream
 
@@ -22,7 +21,6 @@ data class ProductData(
 // Function to read the Excel file from assets and parse it into a list of ProductData
 fun readExcelFile(context: Context, fileName: String): List<ProductData> {
     val productList = mutableListOf<ProductData>()
-    val dataFormatter = DataFormatter() // Formatter to handle different cell types
 
     try {
         // Access the assets folder to get the Excel file
@@ -37,17 +35,17 @@ fun readExcelFile(context: Context, fileName: String): List<ProductData> {
         for (row in sheet) {
             if (row.rowNum == 0) continue // Skip the header row
 
-            // Extracting cell data with formatting to handle numbers as text
-            val purchasePrice = dataFormatter.formatCellValue(row.getCell(0)) // Column A
-            val wholesalePrice = dataFormatter.formatCellValue(row.getCell(1)) // Column B
-            val quantityAvailable = dataFormatter.formatCellValue(row.getCell(2)) // Column C
-            val commonsPrice = dataFormatter.formatCellValue(row.getCell(3)) // Column D
-            val factory = dataFormatter.formatCellValue(row.getCell(4)) // Column E
-            val size = dataFormatter.formatCellValue(row.getCell(5)) // Column F
-            val dosage = dataFormatter.formatCellValue(row.getCell(6)) // Column G
-            val form = dataFormatter.formatCellValue(row.getCell(7)) // Column H
-            val tradeName = dataFormatter.formatCellValue(row.getCell(8)) // Column I
-            val barcode = dataFormatter.formatCellValue(row.getCell(9)) // Column J (barcode as text)
+            // Extracting cell data based on new column mapping
+            val purchasePrice = row.getCell(0).toString() // Column A
+            val wholesalePrice = row.getCell(1).toString() // Column B
+            val quantityAvailable = row.getCell(2).toString() // Column C
+            val commonsPrice = row.getCell(3).toString() // Column D
+            val factory = row.getCell(4).toString() // Column E
+            val size = row.getCell(5).toString() // Column F
+            val dosage = row.getCell(6).toString() // Column G
+            val form = row.getCell(7).toString() // Column H
+            val tradeName = row.getCell(8).toString() // Column I
+            val barcode = row.getCell(9).toString() // Column J
 
             // Create a ProductData object and add it to the list
             val productData = ProductData(

@@ -9,29 +9,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 
 class MainActivity : ComponentActivity() {
 
@@ -101,7 +91,6 @@ fun MainScreen(
     val allData = remember { readExcelFile(context, "your_excel_file.xlsx") }
     var query by remember { mutableStateOf(scannedBarcode) } // Initialize with scanned barcode
     var searchResults by remember { mutableStateOf(listOf<ProductData>()) }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     // Trigger search only when scannedBarcode changes
     LaunchedEffect(scannedBarcode) {
@@ -139,11 +128,7 @@ fun MainScreen(
                     label = { Text(stringResource(id = R.string.scan_button_text)) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = {
-                        keyboardController?.hide() // Hide keyboard on Done action
-                    })
+                        .padding(8.dp)
                 )
                 LazyColumn {
                     items(searchResults) { result ->
@@ -152,7 +137,6 @@ fun MainScreen(
                             supportingContent = { Text(result.barcode) },
                             modifier = Modifier.clickable {
                                 scannedData.add(result)
-                                searchResults = listOf() // Clear search results after selection
                             }
                         )
                     }
@@ -167,11 +151,7 @@ fun MainScreen(
     ) { innerPadding ->
         Column(modifier = Modifier
             .padding(innerPadding)
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures(onTap = { keyboardController?.hide() }) // Hide keyboard when tapping outside
-            }
-        ) {
+            .fillMaxSize()) {
             ScannedDataTable(scannedData)
         }
     }
@@ -179,23 +159,23 @@ fun MainScreen(
 
 @Composable
 fun ScannedDataTable(scannedData: List<ProductData>) {
-    val scrollState = rememberScrollState()
-    Column(modifier = Modifier
-        .padding(16.dp)
-        .verticalScroll(scrollState)) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(id = R.string.barcode), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.trade_name), modifier = Modifier.weight(2f))
-            Text(text = stringResource(id = R.string.form), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.dosage), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.size), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.factory), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.commons_price), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.quantity_available), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.wholesale_price), modifier = Modifier.weight(1f))
-            Text(text = stringResource(id = R.string.purchase_price), modifier = Modifier.weight(1f))
+    LazyColumn(modifier = Modifier.padding(16.dp)) {
+        item {
+            // Header row
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(text = stringResource(id = R.string.barcode), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.trade_name), modifier = Modifier.weight(2f))
+                Text(text = stringResource(id = R.string.form), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.dosage), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.size), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.factory), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.commons_price), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.quantity_available), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.wholesale_price), modifier = Modifier.weight(1f))
+                Text(text = stringResource(id = R.string.purchase_price), modifier = Modifier.weight(1f))
+            }
         }
-        scannedData.forEach { data ->
+        items(scannedData) { data ->
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)) {

@@ -11,38 +11,44 @@ import com.journeyapps.barcodescanner.CaptureActivity
 
 class ScanActivity : AppCompatActivity() {
 
-    private lateinit var barcodeScannerLauncher: ActivityResultLauncher<Intent>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Initialize the launcher for barcode scanner
-        barcodeScannerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val resultText = result.data?.getStringExtra("SCAN_RESULT")
-                if (resultText != null) {
-                    val resultIntent = Intent().apply {
-                        putExtra("BARCODE_RESULT", resultText)
-                    }
-                    setResult(Activity.RESULT_OK, resultIntent)
-                } else {
-                    showToast(getString(R.string.no_scan_result))
-                }
-            } else {
-                showToast(getString(R.string.scan_failed))
-            }
-            finish()  // Ensure the activity is finished after handling the result
-        }
-
         startBarcodeScanner()
     }
 
     private fun startBarcodeScanner() {
         val intent = Intent(this, CaptureActivity::class.java)
-        barcodeScannerLauncher.launch(intent)
+        startActivityForResult(intent, BARCODE_SCANNER_REQUEST_CODE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == BARCODE_SCANNER_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                val resultText = data.getStringExtra("SCAN_RESULT")
+                if (resultText != null) {
+                    val resultIntent = Intent().apply {
+                        putExtra("BARCODE_RESULT", resultText)
+                    }
+                    setResult(Activity.RESULT_OK, resultIntent)
+                    finish()  // Finish the activity once the result is set
+                } else {
+                    showToast(getString(R.string.no_scan_result))
+                    finish()  // Finish the activity even if there's no result to avoid looping
+                }
+            } else {
+                showToast(getString(R.string.scan_failed))
+                finish()  // Finish the activity if scan failed
+            }
+        }
     }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        private const val BARCODE_SCANNER_REQUEST_CODE = 1001
     }
 }
