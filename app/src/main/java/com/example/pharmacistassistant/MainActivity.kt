@@ -35,11 +35,11 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "Scan result received: ${result.resultCode}")
         if (result.resultCode == Activity.RESULT_OK) {
             val scannedBarcode = result.data?.getStringExtra("SCANNED_BARCODE") ?: ""
-            Log.d("MainActivity", "Scanned barcode: $scannedBarcode")
+            Log.d("MainActivity", "Scanned barcode received: $scannedBarcode")
             if (scannedBarcode.isNotEmpty()) {
                 updateScannedBarcode(scannedBarcode)
             } else {
-                Log.w("MainActivity", "Scanned barcode is null")
+                Log.w("MainActivity", "Scanned barcode is empty")
             }
         } else {
             Log.w("MainActivity", "Scan cancelled or failed")

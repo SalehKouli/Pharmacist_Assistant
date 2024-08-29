@@ -88,6 +88,7 @@ class ScanActivity : AppCompatActivity() {
                             setResult(RESULT_OK, intent)
                             finish()
                             hasScanned = true
+                            return@addOnSuccessListener
                         }
                     }
                 }

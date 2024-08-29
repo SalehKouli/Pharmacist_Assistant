@@ -70,6 +70,7 @@ fun MainScreen(
                     query = query,
                     onQueryChange = { newQuery ->
                         query = newQuery
+                        Log.d("MainScreen", "Query changed to: $query")
                         if (query.isNotEmpty()) {
                             productViewModel.searchByBarcodeOrTradeName(query)
                         }
