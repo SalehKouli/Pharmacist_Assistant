@@ -77,30 +77,22 @@ class ScanActivity : AppCompatActivity() {
 
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    Log.d("ScanActivity", "Barcodes detected: ${barcodes.size}")
-                    for (barcode in barcodes) {
-                        if (!hasScanned) {
-                            val barcodeValue = barcode.rawValue
-                            Log.d("ScanActivity", "Scanned barcode: $barcodeValue")
-                            val intent = Intent().apply {
-                                putExtra("SCANNED_BARCODE", barcodeValue)
-                            }
-                            setResult(RESULT_OK, intent)
-                            finish()
-                            hasScanned = true
-                            return@addOnSuccessListener
+                    if (barcodes.isNotEmpty() && !hasScanned) {
+                        val barcodeValue = barcodes[0].rawValue
+                        Log.d("ScanActivity", "Scanned barcode: $barcodeValue")
+                        val intent = Intent().apply {
+                            putExtra("SCANNED_BARCODE", barcodeValue)
                         }
+                        setResult(RESULT_OK, intent)
+                        hasScanned = true
+                        finish()
+                    } else {
+                        Log.d("ScanActivity", "No valid barcode detected or already scanned.")
                     }
-                }
-                .addOnFailureListener { e ->
-                    Log.e("ScanActivity", "Barcode scanning failed", e)
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
                 }
-        } else {
-            Log.w("ScanActivity", "MediaImage is null")
-            imageProxy.close()
         }
     }
 
