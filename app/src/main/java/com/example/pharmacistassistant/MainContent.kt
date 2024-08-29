@@ -21,19 +21,13 @@ fun MainContent(
 ) {
     val scope = rememberCoroutineScope()
 
-    Column(modifier = modifier.padding(16.dp).fillMaxSize()) {
-
-        Spacer(modifier = Modifier.height(16.dp))
+    Column(modifier = modifier.fillMaxSize()) {
 
         // Button to open/close filters drawer
         Button(
             onClick = {
                 scope.launch {
-                    if (drawerState.isClosed) {
-                        drawerState.open()
-                    } else {
-                        drawerState.close()
-                    }
+                    if (drawerState.isClosed) drawerState.open() else drawerState.close()
                 }
             },
             modifier = Modifier
@@ -43,15 +37,13 @@ fun MainContent(
             Text(stringResource(id = R.string.open_filters))
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Use ScannedDataTable to display the data
-        ScannedDataTable(
-            scannedData = selectedProducts,
-            selectedColumns = columnSelection.value
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        // Table
+        Box(modifier = Modifier.weight(1f)) {
+            ScannedDataTable(
+                scannedData = selectedProducts,
+                selectedColumns = columnSelection.value
+            )
+        }
 
         // Display total commons price
         val totalCommonsPrice = selectedProducts.sumOf { it.commonsPrice.toDoubleOrNull() ?: 0.0 }
@@ -60,10 +52,9 @@ fun MainContent(
                 id = R.string.total_commons_price,
                 String.format(Locale.getDefault(), "%.2f", totalCommonsPrice)
             ),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(8.dp)
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Reset Button
         Button(
