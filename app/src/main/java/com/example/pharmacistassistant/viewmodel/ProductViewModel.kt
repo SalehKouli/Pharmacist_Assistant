@@ -1,6 +1,7 @@
 package com.example.pharmacistassistant.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pharmacistassistant.ProductData
@@ -34,11 +35,13 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun searchByBarcodeOrTradeName(query: String) {
+        Log.d("ProductViewModel", "Searching for: $query")
         viewModelScope.launch {
             _searchResults.value = _allProducts.value.filter {
                 it.barcode.contains(query, ignoreCase = true) ||
                         it.tradeName.contains(query, ignoreCase = true)
             }
+            Log.d("ProductViewModel", "Search results: ${_searchResults.value.size}")
         }
     }
 

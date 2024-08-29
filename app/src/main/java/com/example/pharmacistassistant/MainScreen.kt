@@ -3,6 +3,7 @@ package com.example.pharmacistassistant
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -20,7 +21,7 @@ fun MainScreen(
     onScanButtonClick: () -> Unit
 ) {
     val searchResults by productViewModel.searchResults.collectAsState()
-    var query by remember { mutableStateOf(scannedBarcode) }
+    var query by remember { mutableStateOf("") }
     var isDropdownVisible by remember { mutableStateOf(false) }
     var selectedProducts by remember { mutableStateOf(listOf<ProductData>()) }
     val columnSelection = remember { mutableStateOf(getInitialColumnSelection().toMap()) }
@@ -40,8 +41,12 @@ fun MainScreen(
     )
 
     LaunchedEffect(scannedBarcode) {
-        query = scannedBarcode
-        productViewModel.searchByBarcodeOrTradeName(query)
+        Log.d("MainScreen", "LaunchedEffect triggered with scannedBarcode: $scannedBarcode")
+        if (scannedBarcode.isNotEmpty()) {
+            query = scannedBarcode
+            Log.d("MainScreen", "Updating query to: $query")
+            productViewModel.searchByBarcodeOrTradeName(query)
+        }
     }
 
     fun checkAndRequestCameraPermission() {

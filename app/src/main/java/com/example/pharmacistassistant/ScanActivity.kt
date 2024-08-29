@@ -2,7 +2,7 @@ package com.example.pharmacistassistant
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -77,9 +77,11 @@ class ScanActivity : AppCompatActivity() {
 
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
+                    Log.d("ScanActivity", "Barcodes detected: ${barcodes.size}")
                     for (barcode in barcodes) {
                         if (!hasScanned) {
                             val barcodeValue = barcode.rawValue
+                            Log.d("ScanActivity", "Scanned barcode: $barcodeValue")
                             val intent = Intent().apply {
                                 putExtra("SCANNED_BARCODE", barcodeValue)
                             }
@@ -89,12 +91,15 @@ class ScanActivity : AppCompatActivity() {
                         }
                     }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Barcode scanning failed", Toast.LENGTH_SHORT).show()
+                .addOnFailureListener { e ->
+                    Log.e("ScanActivity", "Barcode scanning failed", e)
                 }
                 .addOnCompleteListener {
                     imageProxy.close()
                 }
+        } else {
+            Log.w("ScanActivity", "MediaImage is null")
+            imageProxy.close()
         }
     }
 

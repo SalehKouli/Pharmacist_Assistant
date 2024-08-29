@@ -1,9 +1,11 @@
 package com.example.pharmacistassistant
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
@@ -15,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import com.example.pharmacistassistant.ui.theme.PharmacistAssistantTheme
-import com.example.pharmacistassistant.utils.AppLogger
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
 
@@ -31,13 +32,31 @@ class MainActivity : AppCompatActivity() {
     private val scanBarcodeLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        handleScanResult(result)
+        Log.d("MainActivity", "Scan result received: ${result.resultCode}")
+        if (result.resultCode == Activity.RESULT_OK) {
+            val scannedBarcode = result.data?.getStringExtra("SCANNED_BARCODE") ?: ""
+            Log.d("MainActivity", "Scanned barcode: $scannedBarcode")
+            if (scannedBarcode.isNotEmpty()) {
+                updateScannedBarcode(scannedBarcode)
+            } else {
+                Log.w("MainActivity", "Scanned barcode is null")
+            }
+        } else {
+            Log.w("MainActivity", "Scan cancelled or failed")
+        }
+    }
+
+    private fun updateScannedBarcode(barcode: String) {
+        Log.d("MainActivity", "Updating scanned barcode: $barcode")
+        scannedBarcode = barcode
+        hasScannedBarcode = true
+        productViewModel.searchByBarcodeOrTradeName(barcode)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppLogger.logDebug(this, "onCreate called")
-        AppLogger.logDebug(this, "scannedBarcode: $scannedBarcode")
+        Log.d("MainActivity", "onCreate called")
+        Log.d("MainActivity", "Initial scannedBarcode: $scannedBarcode")
 
         setContent {
             PharmacistAssistantTheme {
@@ -50,22 +69,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleScanResult(result: ActivityResult) {
-        AppLogger.logDebug(this, "handleScanResult called")
-        if (result.resultCode == RESULT_OK) {
-            result.data?.getStringExtra("SCANNED_BARCODE")?.let {
-                scannedBarcode = it
-                hasScannedBarcode = true
-                AppLogger.logDebug(this, "Scanned barcode: $scannedBarcode")
-                // Trigger search with the scanned barcode
-                productViewModel.searchByBarcodeOrTradeName(scannedBarcode)
-            }
-        } else {
-            hasScannedBarcode = false
-            Toast.makeText(this, R.string.no_scan_result, Toast.LENGTH_SHORT).show()
-            AppLogger.logDebug(this, "No barcode scanned")
-        }
-    }
 
     private fun checkAndRequestCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
