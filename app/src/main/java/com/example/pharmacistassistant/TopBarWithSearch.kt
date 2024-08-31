@@ -1,6 +1,7 @@
 // TopBarWithSearch.kt
 package com.example.pharmacistassistant
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -38,7 +39,10 @@ fun TopBarWithSearch(
         Box {
             OutlinedTextField(
                 value = query,
-                onValueChange = onQueryChange,
+                onValueChange = { newQuery ->
+                    Log.d("TopBarWithSearch", "Query changed to: $newQuery")
+                    onQueryChange(newQuery)
+                },
                 label = { Text(stringResource(id = R.string.search)) },
                 modifier = Modifier
                     .fillMaxWidth()

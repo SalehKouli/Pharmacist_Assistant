@@ -69,7 +69,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun checkAndRequestCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             val intent = Intent(this, ScanActivity::class.java)

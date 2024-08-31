@@ -105,6 +105,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.ui2)
     implementation(libs.androidx.compose.ui.ui.tooling.preview3)
     implementation(libs.androidx.material)
+    implementation(libs.zxing.android.embedded)
 
     // Testing libraries
     testImplementation(libs.junit)
