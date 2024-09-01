@@ -1,15 +1,11 @@
 package com.example.pharmacistassistant
 
 import android.Manifest
-import android.app.Activity
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
@@ -19,6 +15,8 @@ import androidx.core.content.ContextCompat
 import com.example.pharmacistassistant.ui.theme.PharmacistAssistantTheme
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,30 +24,20 @@ class MainActivity : AppCompatActivity() {
         ProductViewModelFactory(application)
     }
 
-    private var hasScannedBarcode by mutableStateOf(false)
     private var scannedBarcode by mutableStateOf("")
 
-    private val scanBarcodeLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        Log.d("MainActivity", "Scan result received: ${result.resultCode}")
-        if (result.resultCode == Activity.RESULT_OK) {
-            val scannedBarcode = result.data?.getStringExtra("SCANNED_BARCODE") ?: ""
-            Log.d("MainActivity", "Received scanned barcode: '$scannedBarcode'")
-            if (scannedBarcode.isNotEmpty()) {
-                updateScannedBarcode(scannedBarcode)
-            } else {
-                Log.w("MainActivity", "Received scanned barcode is empty.")
-            }
+    private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
+        if (result.contents == null) {
+            Log.d("MainActivity", "Scan cancelled")
         } else {
-            Log.w("MainActivity", "Scan cancelled or failed")
+            Log.d("MainActivity", "Scanned barcode: ${result.contents}")
+            updateScannedBarcode(result.contents)
         }
     }
 
     private fun updateScannedBarcode(barcode: String) {
         Log.d("MainActivity", "Updating scanned barcode: $barcode")
         scannedBarcode = barcode
-        hasScannedBarcode = true
         productViewModel.searchByBarcodeOrTradeName(barcode)
     }
 
@@ -70,22 +58,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAndRequestCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            val intent = Intent(this, ScanActivity::class.java)
-            scanBarcodeLauncher.launch(intent)
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        when {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
+                startBarcodeScanner()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
+                Toast.makeText(this, R.string.camera_permission_required, Toast.LENGTH_LONG).show()
+            }
+            else -> {
+                requestPermissions(arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST_CODE)
+            }
         }
     }
 
-    private val cameraPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            val intent = Intent(this, ScanActivity::class.java)
-            scanBarcodeLauncher.launch(intent)
-        } else {
-            Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show()
+    private fun startBarcodeScanner() {
+        val options = ScanOptions()
+            .setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
+            .setPrompt(getString(R.string.scan_button_text))
+            .setCameraId(0)
+            .setBeepEnabled(false)
+            .setBarcodeImageEnabled(true)
+            .setOrientationLocked(false)
+
+        barcodeLauncher.launch(options)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startBarcodeScanner()
+            } else {
+                Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    companion object {
+        private const val CAMERA_PERMISSION_REQUEST_CODE = 100
     }
 }

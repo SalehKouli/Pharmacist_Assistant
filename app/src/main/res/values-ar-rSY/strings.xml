@@ -19,4 +19,5 @@
     <string name="select_columns">فلترة البيانات المعروضة</string>
     <string name="camera_permission_denied">تم رفض أذونات الكاميرا</string>
     <string name="open_filters">الفلاتر</string>
+    <string name="camera_permission_required">يجب إعطاء الإذن باستعمال الكاميرا</string>
 </resources>

@@ -1,17 +1,11 @@
 package com.example.pharmacistassistant
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 
 @Composable
@@ -30,16 +24,6 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            if (isGranted) {
-                val intent = Intent(context, ScanActivity::class.java)
-                context.startActivity(intent)
-            }
-        }
-    )
-
     LaunchedEffect(scannedBarcode) {
         Log.d("MainScreen", "LaunchedEffect triggered with scannedBarcode: $scannedBarcode")
         if (scannedBarcode.isNotEmpty()) {
@@ -49,19 +33,10 @@ fun MainScreen(
         }
     }
 
-    fun checkAndRequestCameraPermission() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            val intent = Intent(context, ScanActivity::class.java)
-            context.startActivity(intent)
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            DrawerContent(columnSelection) // Drawer should only contain the filtering checklist
+            DrawerContent(columnSelection)
         }
     ) {
         Scaffold(
@@ -85,12 +60,12 @@ fun MainScreen(
                 )
             },
             floatingActionButton = {
-                FloatingActionButtonWithPermission(onClick = { checkAndRequestCameraPermission() })
+                FloatingActionButtonWithPermission(onClick = onScanButtonClick)
             }
         ) { innerPadding ->
             MainContent(
                 modifier = Modifier.padding(innerPadding),
-                productViewModel = productViewModel, // Pass productViewModel here
+                productViewModel = productViewModel,
                 drawerState = drawerState,
                 selectedProducts = selectedProducts,
                 columnSelection = columnSelection,
