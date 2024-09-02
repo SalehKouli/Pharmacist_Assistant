@@ -1,5 +1,6 @@
 package com.example.pharmacistassistant
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -47,6 +48,7 @@ fun MainContent(
 
         // Display total commons price
         val totalCommonsPrice = selectedProducts.sumOf { it.commonsPrice.toDoubleOrNull() ?: 0.0 }
+        Log.d("MainContent", "Selected products: ${selectedProducts.size}, Total commons price: $totalCommonsPrice")
         Text(
             text = stringResource(
                 id = R.string.total_commons_price,

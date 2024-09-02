@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
@@ -25,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private var scannedBarcode by mutableStateOf("")
+    private var lastScanTime by mutableLongStateOf(0L)
 
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
         if (result.contents == null) {
@@ -38,11 +40,13 @@ class MainActivity : AppCompatActivity() {
     private fun updateScannedBarcode(barcode: String) {
         Log.d("MainActivity", "Updating scanned barcode: $barcode")
         scannedBarcode = barcode
+        lastScanTime = System.currentTimeMillis()
         setContent {
             PharmacistAssistantTheme {
                 MainScreen(
                     productViewModel = productViewModel,
                     scannedBarcode = scannedBarcode,
+                    lastScanTime = lastScanTime,
                     onScanButtonClick = { checkAndRequestCameraPermission() }
                 )
             }
@@ -60,6 +64,7 @@ class MainActivity : AppCompatActivity() {
                 MainScreen(
                     productViewModel = productViewModel,
                     scannedBarcode = scannedBarcode,
+                    lastScanTime = lastScanTime,
                     onScanButtonClick = { checkAndRequestCameraPermission() }
                 )
             }

@@ -42,6 +42,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
                         it.tradeName.contains(query, ignoreCase = true)
             }
             Log.d("ProductViewModel", "Search results: ${_searchResults.value.size}")
+            _searchResults.value.forEach {
+                Log.d("ProductViewModel", "Result: ${it.tradeName}, Commons price: ${it.commonsPrice}")
+            }
         }
     }
 

@@ -14,6 +14,7 @@ import com.example.pharmacistassistant.viewmodel.ProductViewModel
 fun MainScreen(
     productViewModel: ProductViewModel,
     scannedBarcode: String,
+    lastScanTime: Long,
     onScanButtonClick: () -> Unit
 ) {
     val searchResults by productViewModel.searchResults.collectAsState()
@@ -26,7 +27,7 @@ fun MainScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(scannedBarcode) {
+    LaunchedEffect(scannedBarcode, lastScanTime) {
         Log.d("MainScreen", "LaunchedEffect triggered with scannedBarcode: $scannedBarcode")
         if (scannedBarcode.isNotEmpty()) {
             query = scannedBarcode
@@ -58,6 +59,7 @@ fun MainScreen(
                     searchResults = searchResults,
                     onDropdownItemSelected = { result ->
                         selectedProducts = selectedProducts + result
+                        Log.d("MainScreen", "Added product to selection: ${result.tradeName}, Commons price: ${result.commonsPrice}")
                         isDropdownVisible = false
                     }
                 )
