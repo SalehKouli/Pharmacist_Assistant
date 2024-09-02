@@ -53,7 +53,7 @@ fun TopBarWithSearch(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onQueryChange("") }
-                        .padding(8.dp)
+                        .padding(top = 60.dp)
                 ) {
                     LazyColumn(
                         modifier = Modifier

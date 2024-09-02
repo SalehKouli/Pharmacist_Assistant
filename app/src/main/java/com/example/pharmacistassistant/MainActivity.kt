@@ -38,8 +38,17 @@ class MainActivity : AppCompatActivity() {
     private fun updateScannedBarcode(barcode: String) {
         Log.d("MainActivity", "Updating scanned barcode: $barcode")
         scannedBarcode = barcode
-        productViewModel.searchByBarcodeOrTradeName(barcode)
+        setContent {
+            PharmacistAssistantTheme {
+                MainScreen(
+                    productViewModel = productViewModel,
+                    scannedBarcode = scannedBarcode,
+                    onScanButtonClick = { checkAndRequestCameraPermission() }
+                )
+            }
+        }
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

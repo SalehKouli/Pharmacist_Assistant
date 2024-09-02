@@ -1,6 +1,8 @@
 package com.example.pharmacistassistant
 
 import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,6 +32,7 @@ fun MainScreen(
             query = scannedBarcode
             Log.d("MainScreen", "Updating query to: $query")
             productViewModel.searchByBarcodeOrTradeName(query)
+            isDropdownVisible = true
         }
     }
 
@@ -63,19 +66,30 @@ fun MainScreen(
                 FloatingActionButtonWithPermission(onClick = onScanButtonClick)
             }
         ) { innerPadding ->
-            MainContent(
-                modifier = Modifier.padding(innerPadding),
-                productViewModel = productViewModel,
-                drawerState = drawerState,
-                selectedProducts = selectedProducts,
-                columnSelection = columnSelection,
-                onReset = {
-                    productViewModel.resetSearch()
-                    query = ""
-                    selectedProducts = emptyList()
-                    columnSelection.value = getInitialColumnSelection().toMutableMap()
-                }
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        isDropdownVisible = false
+                    }
+            ) {
+                MainContent(
+                    modifier = Modifier.padding(innerPadding),
+                    productViewModel = productViewModel,
+                    drawerState = drawerState,
+                    selectedProducts = selectedProducts,
+                    columnSelection = columnSelection,
+                    onReset = {
+                        productViewModel.resetSearch()
+                        query = ""
+                        selectedProducts = emptyList()
+                        columnSelection.value = getInitialColumnSelection().toMutableMap()
+                    }
+                )
+            }
         }
     }
 }
