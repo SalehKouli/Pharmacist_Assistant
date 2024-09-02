@@ -20,20 +20,15 @@ fun MainContent(
     columnSelection: MutableState<Map<Int, Boolean>>,
     onReset: () -> Unit
 ) {
+    LaunchedEffect(selectedProducts) {
+        Log.d("MainContent", "selectedProducts updated in MainContent. Count: ${selectedProducts.size}")
+    }
     val selectedProductsState by remember { mutableStateOf(selectedProducts) }
     val scope = rememberCoroutineScope()
 
-    val totalCommonsPrice by remember(selectedProductsState) {
-        derivedStateOf {
-            selectedProductsState.sumOf { it.commonsPrice.toDoubleOrNull() ?: 0.0 }
-        }
-    }
-
-    LaunchedEffect(selectedProductsState) {
-        Log.d("MainContent", "Selected products changed. Count: ${selectedProductsState.size}")
-    }
-
     Column(modifier = modifier.fillMaxSize()) {
+
+        // Button to open/close filters drawer
         Button(
             onClick = {
                 scope.launch {
@@ -47,13 +42,26 @@ fun MainContent(
             Text(stringResource(id = R.string.open_filters))
         }
 
+        // Table
         Box(modifier = Modifier.weight(1f)) {
             ScannedDataTable(
-                scannedData = selectedProductsState,
+                scannedData = selectedProducts,
                 selectedColumns = columnSelection.value
             )
         }
 
+        // Display total commons price
+        val totalCommonsPrice by remember(selectedProductsState) {
+            derivedStateOf {
+                selectedProductsState.sumOf { it.commonsPrice.toDoubleOrNull() ?: 0.0 }
+            }
+        }
+
+        LaunchedEffect(selectedProductsState) {
+            Log.d("MainContent", "Selected products changed. Count: ${selectedProductsState.size}")
+        }
+
+        Log.d("MainContent", "Calculated total commons price: $totalCommonsPrice")
         Text(
             text = stringResource(
                 id = R.string.total_commons_price,
@@ -63,6 +71,7 @@ fun MainContent(
             modifier = Modifier.padding(8.dp)
         )
 
+        // Reset Button
         Button(
             onClick = onReset,
             modifier = Modifier
