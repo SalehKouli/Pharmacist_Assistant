@@ -17,7 +17,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     val selectedProducts: StateFlow<List<ProductData>> = _selectedProducts
 
     fun updateSelectedProducts(products: List<ProductData>) {
-        _selectedProducts.value = products
+        viewModelScope.launch {
+            _selectedProducts.emit(products)
+        }
     }
 
     val searchResults: StateFlow<List<ProductData>> get() = _searchResults

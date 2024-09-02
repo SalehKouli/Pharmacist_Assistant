@@ -3,23 +3,15 @@ package com.example.pharmacistassistant
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
+import kotlinx.coroutines.launch
+import java.util.*
 
 @Composable
 fun MainScreen(
@@ -32,21 +24,13 @@ fun MainScreen(
     var query by remember { mutableStateOf("") }
     var isDropdownVisible by remember { mutableStateOf(false) }
     val selectedProducts by productViewModel.selectedProducts.collectAsState()
-
-    LaunchedEffect(selectedProducts) {
-        Log.d("MainScreen", "selectedProducts updated. Count: ${selectedProducts.size}")
-    }
-
     val columnSelection = remember { mutableStateOf(getInitialColumnSelection().toMap()) }
-
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(scannedBarcode, lastScanTime) {
-        Log.d("MainScreen", "LaunchedEffect triggered with scannedBarcode: $scannedBarcode")
         if (scannedBarcode.isNotEmpty()) {
             query = scannedBarcode
-            Log.d("MainScreen", "Updating query to: $query")
             productViewModel.searchByBarcodeOrTradeName(query)
             isDropdownVisible = true
         }
@@ -54,9 +38,7 @@ fun MainScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = {
-            DrawerContent(columnSelection)
-        }
+        drawerContent = { DrawerContent(columnSelection) }
     ) {
         Scaffold(
             topBar = {
@@ -64,7 +46,6 @@ fun MainScreen(
                     query = query,
                     onQueryChange = { newQuery ->
                         query = newQuery
-                        Log.d("MainScreen", "Query changed to: $query")
                         if (query.isNotEmpty()) {
                             productViewModel.searchByBarcodeOrTradeName(query)
                         }
@@ -85,6 +66,7 @@ fun MainScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(innerPadding)
                     .clickable(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
@@ -92,22 +74,58 @@ fun MainScreen(
                         isDropdownVisible = false
                     }
             ) {
-                MainContent(
-                    modifier = Modifier.padding(innerPadding),
-                    productViewModel = productViewModel,
-                    drawerState = drawerState,
-                    selectedProducts = selectedProducts,
-                    onSelectedProductsChange = { newProducts ->
-                        productViewModel.updateSelectedProducts(newProducts)
-                    },
-                    columnSelection = columnSelection,
-                    onReset = {
-                        productViewModel.resetSearch()
-                        query = ""
-                        productViewModel.updateSelectedProducts(emptyList())
-                        columnSelection.value = getInitialColumnSelection().toMutableMap()
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                if (drawerState.isClosed) drawerState.open() else drawerState.close()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        Text(stringResource(id = R.string.open_filters))
                     }
-                )
+
+                    Box(modifier = Modifier.weight(1f)) {
+                        ScannedDataTable(
+                            scannedData = selectedProducts,
+                            selectedColumns = columnSelection.value,
+                            onProductRemove = { product ->
+                                productViewModel.updateSelectedProducts(selectedProducts - product)
+                            }
+                        )
+                    }
+
+                    val totalCommonsPrice by remember(selectedProducts) {
+                        derivedStateOf {
+                            selectedProducts.sumOf { it.commonsPrice.toDoubleOrNull() ?: 0.0 }
+                        }
+                    }
+                    Text(
+                        text = stringResource(
+                            id = R.string.total_commons_price,
+                            String.format(Locale.getDefault(), "%.2f", totalCommonsPrice)
+                        ),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(8.dp)
+                    )
+
+                    Button(
+                        onClick = {
+                            productViewModel.resetSearch()
+                            query = ""
+                            productViewModel.updateSelectedProducts(emptyList())
+                            columnSelection.value = getInitialColumnSelection().toMutableMap()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    ) {
+                        Text(stringResource(id = R.string.reset_table))
+                    }
+                }
             }
         }
     }
