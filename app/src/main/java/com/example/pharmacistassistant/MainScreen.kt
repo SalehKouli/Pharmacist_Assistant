@@ -100,17 +100,24 @@ fun MainScreen(
 
                     val totalCommonsPrice by remember(selectedProducts) {
                         derivedStateOf {
-                            selectedProducts.sumOf { it.commonsPrice.toDoubleOrNull() ?: 0.0 }
+                            selectedProducts.forEach {
+                                Log.d("MainScreen", "Product: ${it.tradeName}, Commons Price: ${it.commonsPrice}")
+                            }
+                            val total = selectedProducts.sumOf { it.commonsPrice.trim().toDoubleOrNull() ?: 0.0 }
+                            Log.d("MainScreen", "Computed Total Commons Price: $total")
+                            total
                         }
                     }
+
                     Text(
                         text = stringResource(
                             id = R.string.total_commons_price,
-                            String.format(Locale.getDefault(), "%.2f", totalCommonsPrice)
+                            totalCommonsPrice
                         ),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(8.dp)
                     )
+
 
                     Button(
                         onClick = {

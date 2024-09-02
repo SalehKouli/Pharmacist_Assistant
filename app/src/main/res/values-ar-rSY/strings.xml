@@ -14,7 +14,7 @@
     <string name="scan_button_text">مسح الباركود</string>
     <string name="search"> البحث عن الاسم التجاري أو الباركود </string>
     <string name="scan_failed">فشل المسح</string>
-    <string name="total_commons_price">المبلغ الإجمالي للعموم:</string>
+    <string name="total_commons_price">المبلغ الإجمالي للعموم: %s</string>
     <string name="reset_table">مسح الفاتورة</string>
     <string name="select_columns">فلترة البيانات المعروضة</string>
     <string name="camera_permission_denied">تم رفض أذونات الكاميرا</string>

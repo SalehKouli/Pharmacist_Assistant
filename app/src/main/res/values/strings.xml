@@ -14,7 +14,7 @@
     <string name="purchase_price">Purchase Price</string>
     <string name="no_scan_result">No scan result found</string>
     <string name="scan_failed">Scan failed</string>
-    <string name="total_commons_price">Total Commons Price:</string>
+    <string name="total_commons_price">Total Commons Price: %s</string>
     <string name="reset_table">Reset Table</string>
     <string name="select_columns">Select Columns</string>
     <string name="camera_permission_denied">Camera Permission Denied</string>
