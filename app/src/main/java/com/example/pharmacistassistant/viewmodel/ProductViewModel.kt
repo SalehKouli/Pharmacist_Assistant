@@ -13,6 +13,13 @@ import kotlinx.coroutines.launch
 class ProductViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _searchResults = MutableStateFlow<List<ProductData>>(emptyList())
+    private val _selectedProducts = MutableStateFlow<List<ProductData>>(emptyList())
+    val selectedProducts: StateFlow<List<ProductData>> = _selectedProducts
+
+    fun updateSelectedProducts(products: List<ProductData>) {
+        _selectedProducts.value = products
+    }
+
     val searchResults: StateFlow<List<ProductData>> get() = _searchResults
 
     private val _allProducts = MutableStateFlow<List<ProductData>>(emptyList())

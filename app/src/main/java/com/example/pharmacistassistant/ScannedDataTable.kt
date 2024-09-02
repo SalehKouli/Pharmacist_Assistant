@@ -12,7 +12,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ScannedDataTable(scannedData: List<ProductData>, selectedColumns: Map<Int, Boolean>) {
+fun ScannedDataTable(
+    scannedData: List<ProductData>,
+    selectedColumns: Map<Int, Boolean>,
+    onProductRemove: (ProductData) -> Unit) {
     val horizontalScrollState = rememberScrollState()
 
     LazyColumn(

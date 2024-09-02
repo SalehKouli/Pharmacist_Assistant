@@ -17,11 +17,13 @@ fun MainContent(
     productViewModel: ProductViewModel,
     drawerState: DrawerState,
     selectedProducts: List<ProductData>,
+    onSelectedProductsChange: (List<ProductData>) -> Unit,
     columnSelection: MutableState<Map<Int, Boolean>>,
     onReset: () -> Unit
 ) {
     LaunchedEffect(selectedProducts) {
         Log.d("MainContent", "selectedProducts updated in MainContent. Count: ${selectedProducts.size}")
+        productViewModel.updateSelectedProducts(selectedProducts)
     }
     val selectedProductsState by remember { mutableStateOf(selectedProducts) }
     val scope = rememberCoroutineScope()
@@ -46,7 +48,10 @@ fun MainContent(
         Box(modifier = Modifier.weight(1f)) {
             ScannedDataTable(
                 scannedData = selectedProducts,
-                selectedColumns = columnSelection.value
+                selectedColumns = columnSelection.value,
+                onProductRemove = { product: ProductData ->
+                    onSelectedProductsChange(selectedProducts - listOf(product).toSet())
+                }
             )
         }
 

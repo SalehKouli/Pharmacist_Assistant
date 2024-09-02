@@ -3,11 +3,22 @@ package com.example.pharmacistassistant
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 
 @Composable
@@ -20,7 +31,7 @@ fun MainScreen(
     val searchResults by productViewModel.searchResults.collectAsState()
     var query by remember { mutableStateOf("") }
     var isDropdownVisible by remember { mutableStateOf(false) }
-    var selectedProducts by remember { mutableStateOf(listOf<ProductData>()) }
+    val selectedProducts by productViewModel.selectedProducts.collectAsState()
 
     LaunchedEffect(selectedProducts) {
         Log.d("MainScreen", "selectedProducts updated. Count: ${selectedProducts.size}")
@@ -28,7 +39,6 @@ fun MainScreen(
 
     val columnSelection = remember { mutableStateOf(getInitialColumnSelection().toMap()) }
 
-    val context = LocalContext.current
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -63,9 +73,7 @@ fun MainScreen(
                     isDropdownVisible = isDropdownVisible,
                     searchResults = searchResults,
                     onDropdownItemSelected = { result ->
-                        Log.d("MainScreen", "Before adding product. Current count: ${selectedProducts.size}")
-                        selectedProducts = selectedProducts + result
-                        Log.d("MainScreen", "Added product to selection: ${result.tradeName}, Commons price: ${result.commonsPrice}")
+                        productViewModel.updateSelectedProducts(selectedProducts + result)
                         isDropdownVisible = false
                     }
                 )
@@ -89,11 +97,14 @@ fun MainScreen(
                     productViewModel = productViewModel,
                     drawerState = drawerState,
                     selectedProducts = selectedProducts,
+                    onSelectedProductsChange = { newProducts ->
+                        productViewModel.updateSelectedProducts(newProducts)
+                    },
                     columnSelection = columnSelection,
                     onReset = {
                         productViewModel.resetSearch()
                         query = ""
-                        selectedProducts = emptyList()
+                        productViewModel.updateSelectedProducts(emptyList())
                         columnSelection.value = getInitialColumnSelection().toMutableMap()
                     }
                 )
