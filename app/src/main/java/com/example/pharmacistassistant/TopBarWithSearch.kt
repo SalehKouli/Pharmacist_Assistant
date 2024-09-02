@@ -66,6 +66,7 @@ fun TopBarWithSearch(
                                 headlineContent = { Text(result.tradeName) },
                                 supportingContent = { Text(result.barcode) },
                                 modifier = Modifier.clickable {
+                                    Log.d("TopBarWithSearch", "Dropdown item clicked: ${result.tradeName}")
                                     onDropdownItemSelected(result)
                                 }
                             )

@@ -20,6 +20,9 @@ fun MainContent(
     columnSelection: MutableState<Map<Int, Boolean>>,
     onReset: () -> Unit
 ) {
+    LaunchedEffect(selectedProducts) {
+        Log.d("MainContent", "selectedProducts updated in MainContent. Count: ${selectedProducts.size}")
+    }
     val scope = rememberCoroutineScope()
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -47,8 +50,11 @@ fun MainContent(
         }
 
         // Display total commons price
-        val totalCommonsPrice = selectedProducts.sumOf { it.commonsPrice.toDoubleOrNull() ?: 0.0 }
-        Log.d("MainContent", "Selected products: ${selectedProducts.size}, Total commons price: $totalCommonsPrice")
+        val totalCommonsPrice = selectedProducts.sumOf {
+            Log.d("MainContent", "Processing product: ${it.tradeName}, Commons price: ${it.commonsPrice}")
+            it.commonsPrice.toDoubleOrNull() ?: 0.0
+        }
+        Log.d("MainContent", "Calculated total commons price: $totalCommonsPrice")
         Text(
             text = stringResource(
                 id = R.string.total_commons_price,

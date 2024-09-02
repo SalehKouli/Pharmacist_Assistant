@@ -21,6 +21,11 @@ fun MainScreen(
     var query by remember { mutableStateOf("") }
     var isDropdownVisible by remember { mutableStateOf(false) }
     var selectedProducts by remember { mutableStateOf(listOf<ProductData>()) }
+
+    LaunchedEffect(selectedProducts) {
+        Log.d("MainScreen", "selectedProducts updated. Count: ${selectedProducts.size}")
+    }
+
     val columnSelection = remember { mutableStateOf(getInitialColumnSelection().toMap()) }
 
     val context = LocalContext.current
@@ -58,6 +63,7 @@ fun MainScreen(
                     isDropdownVisible = isDropdownVisible,
                     searchResults = searchResults,
                     onDropdownItemSelected = { result ->
+                        Log.d("MainScreen", "Before adding product. Current count: ${selectedProducts.size}")
                         selectedProducts = selectedProducts + result
                         Log.d("MainScreen", "Added product to selection: ${result.tradeName}, Commons price: ${result.commonsPrice}")
                         isDropdownVisible = false
