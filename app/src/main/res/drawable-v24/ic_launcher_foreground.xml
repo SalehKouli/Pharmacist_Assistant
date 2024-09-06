@@ -3,6 +3,7 @@
     <item>
         <bitmap
             android:src="@drawable/ic_launcher"
-            android:gravity="center" />
+            android:gravity="center"
+            android:tileMode="disabled" />
     </item>
 </layer-list>
