@@ -25,6 +25,7 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import okhttp3.*
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -127,7 +128,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkForUpdate(currentVersionCode: Int, onResult: (Boolean, String?) -> Unit) {
         val client = OkHttpClient()
         val request = Request.Builder()
-            .url("https://github.com/SalehKouli/Pharmacist_Assistant/blob/master/version.json") // Replace with your actual hosted version file URL
+            .url("https://raw.githubusercontent.com/SalehKouli/Pharmacist_Assistant/master/version.json") // Replace with your actual hosted version file URL
             .build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -138,10 +139,15 @@ class MainActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 response.body?.string()?.let { responseBody ->
-                    val versionInfo = Gson().fromJson(responseBody, VersionInfo::class.java)
-                    if (versionInfo.versionCode > currentVersionCode) {
-                        onResult(true, versionInfo.apkUrl)
-                    } else {
+                    try {
+                        val versionInfo = Gson().fromJson(responseBody, VersionInfo::class.java)
+                        if (versionInfo.versionCode > currentVersionCode) {
+                            onResult(true, versionInfo.apkUrl)
+                        } else {
+                            onResult(false, null)
+                        }
+                    } catch (e: JsonSyntaxException) {
+                        Log.e("MainActivity", "JSON parsing error", e)
                         onResult(false, null)
                     }
                 }
