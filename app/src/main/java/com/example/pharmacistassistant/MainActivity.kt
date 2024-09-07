@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkForUpdate(currentVersionCode: Int, onResult: (Boolean, String?) -> Unit) {
         val client = OkHttpClient()
         val request = Request.Builder()
-            .url("https://raw.githubusercontent.com/SalehKouli/Pharmacist_Assistant/master/version.json") // Replace with your actual hosted version file URL
+            .url("https://raw.githubusercontent.com/SalehKouli/Pharmacist_Assistant/master/version.json")
             .build()
 
         client.newCall(request).enqueue(object : Callback {
@@ -138,18 +138,30 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                if (!response.isSuccessful) {
+                    Log.e("MainActivity", "Unsuccessful response code: ${response.code}")
+                    onResult(false, null)
+                    return
+                }
+
                 response.body?.string()?.let { responseBody ->
+                    Log.d("MainActivity", "Received version.json: $responseBody") // Log raw JSON response
                     try {
                         val versionInfo = Gson().fromJson(responseBody, VersionInfo::class.java)
                         if (versionInfo.versionCode > currentVersionCode) {
+                            Log.d("MainActivity", "New version available: ${versionInfo.versionCode}")
                             onResult(true, versionInfo.apkUrl)
                         } else {
+                            Log.d("MainActivity", "No update needed. Current version: $currentVersionCode")
                             onResult(false, null)
                         }
                     } catch (e: JsonSyntaxException) {
                         Log.e("MainActivity", "JSON parsing error", e)
                         onResult(false, null)
                     }
+                } ?: run {
+                    Log.e("MainActivity", "Response body is null")
+                    onResult(false, null)
                 }
             }
         })
