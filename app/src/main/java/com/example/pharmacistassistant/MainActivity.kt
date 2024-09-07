@@ -1,12 +1,17 @@
 package com.example.pharmacistassistant
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -18,6 +23,9 @@ import com.example.pharmacistassistant.viewmodel.ProductViewModel
 import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import okhttp3.*
+import com.google.gson.Gson
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,6 +45,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Register for result when requesting the install packages permission
+    private val installPackagesPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        checkForAppUpdate() // Retry update check if the permission is granted
+    }
+
     private fun updateScannedBarcode(barcode: String) {
         Log.d("MainActivity", "Updating scanned barcode: $barcode")
         scannedBarcode = barcode
@@ -53,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate called")
@@ -69,6 +83,9 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+
+        // Check for app updates
+        checkForAppUpdate()
     }
 
     private fun checkAndRequestCameraPermission() {
@@ -95,6 +112,69 @@ class MainActivity : AppCompatActivity() {
             .setOrientationLocked(false)
 
         barcodeLauncher.launch(options)
+    }
+
+    private fun checkForAppUpdate() {
+        val currentVersionCode = AppConstants.VERSION_CODE
+
+        checkForUpdate(currentVersionCode) { isUpdateAvailable, channelUrl ->
+            if (isUpdateAvailable && channelUrl != null) {
+                showUpdateDialog(channelUrl)
+            }
+        }
+    }
+
+    private fun checkForUpdate(currentVersionCode: Int, onResult: (Boolean, String?) -> Unit) {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("https://github.com/SalehKouli/Pharmacist_Assistant/blob/master/version.json") // Replace with your actual hosted version file URL
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("MainActivity", "Failed to check for updates", e)
+                onResult(false, null)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.body?.string()?.let { responseBody ->
+                    val versionInfo = Gson().fromJson(responseBody, VersionInfo::class.java)
+                    if (versionInfo.versionCode > currentVersionCode) {
+                        onResult(true, versionInfo.apkUrl)
+                    } else {
+                        onResult(false, null)
+                    }
+                }
+            }
+        })
+    }
+
+    private fun showUpdateDialog(channelUrl: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Update Available")
+        builder.setMessage("A new version of the app is available. Please visit our Telegram channel to update.")
+        builder.setCancelable(false) // Make the dialog not cancelable
+        builder.setPositiveButton("Go to Channel") { _, _ ->
+            if (!packageManager.canRequestPackageInstalls()) {
+                requestInstallPackagesPermission()
+            } else {
+                redirectToChannel(channelUrl)
+            }
+        }
+        builder.show()
+    }
+
+    private fun redirectToChannel(channelUrl: String) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(channelUrl)
+        startActivity(intent)
+        finish() // Close the app after redirecting to the channel
+    }
+
+    private fun requestInstallPackagesPermission() {
+        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
+        intent.data = Uri.parse("package:$packageName")
+        installPackagesPermissionLauncher.launch(intent)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

@@ -107,6 +107,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.ui.tooling.preview3)
     implementation(libs.androidx.material)
     implementation(libs.zxing.android.embedded)
+    implementation(libs.okhttp)
+    implementation(libs.gson)
 
     // Testing libraries
     testImplementation(libs.junit)
