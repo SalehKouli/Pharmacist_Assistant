@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkForUpdate(currentVersionCode: Int, onResult: (Boolean, String?) -> Unit) {
         val client = OkHttpClient()
         val request = Request.Builder()
-            .url("https://raw.githubusercontent.com/SalehKouli/Pharmacist_Assistant/master/version.json")
+            .url("https://drive.google.com/uc?export=download&id=1v2uRhoo2HytfR0_Aa4r8PXNfglLD7pmO")
             .build()
 
         client.newCall(request).enqueue(object : Callback {
