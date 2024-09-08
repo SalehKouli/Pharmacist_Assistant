@@ -179,6 +179,9 @@ class MainActivity : AppCompatActivity() {
                 redirectToChannel(channelUrl)
             }
         }
+        builder.setNegativeButton("Later") { dialog, _ ->
+            dialog.dismiss() // Allow the user to continue using the app without updating immediately
+        }
         builder.show()
     }
 
@@ -186,7 +189,6 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = Uri.parse(channelUrl)
         startActivity(intent)
-        finish() // Close the app after redirecting to the channel
     }
 
     private fun requestInstallPackagesPermission() {
