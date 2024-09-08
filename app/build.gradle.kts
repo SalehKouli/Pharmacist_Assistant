@@ -109,6 +109,7 @@ dependencies {
     implementation(libs.zxing.android.embedded)
     implementation(libs.okhttp)
     implementation(libs.gson)
+    implementation(libs.androidx.compose.material3)
 
     // Testing libraries
     testImplementation(libs.junit)

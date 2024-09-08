@@ -20,4 +20,7 @@
     <string name="camera_permission_denied">تم رفض أذونات الكاميرا</string>
     <string name="open_filters">الفلاتر</string>
     <string name="camera_permission_required">يجب إعطاء الإذن باستعمال الكاميرا</string>
+    <string name="update_available">يتوفر تحديث جديد</string>
+    <string name="update_message">يتوفر إصدار جديد من التطبيق. يرجى زيارة قناة التيليغرام الخاصة بنا للحصول على أحدث إصدار.</string>
+    <string name="go_to_channel">الذهاب إلى القناة</string>
 </resources>

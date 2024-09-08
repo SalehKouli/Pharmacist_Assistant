@@ -177,10 +177,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showUpdateDialog(channelUrl: String) {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Update Available")
-        builder.setMessage("A new version of the app is available. Please visit our Telegram channel to update.")
+        builder.setTitle(getString(R.string.update_available))
+        builder.setMessage(getString(R.string.update_message))
         builder.setCancelable(false) // Make the dialog not cancelable
-        builder.setPositiveButton("Go to Channel") { _, _ ->
+        builder.setPositiveButton(getString(R.string.go_to_channel)) { _, _ ->
             redirectToChannel(channelUrl) // Directly redirect to the channel
         }
         builder.show()

@@ -20,4 +20,7 @@
     <string name="camera_permission_denied">Camera Permission Denied</string>
     <string name="open_filters">Filters</string>
     <string name="camera_permission_required">Camera Permission Required</string>
+    <string name="update_available">Update Available</string>
+    <string name="update_message">A new version of the app is available. Please visit our Telegram channel to update.</string>
+    <string name="go_to_channel">Go to Channel</string>
 </resources>
