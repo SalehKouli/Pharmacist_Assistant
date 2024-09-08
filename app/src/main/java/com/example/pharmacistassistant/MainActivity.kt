@@ -181,14 +181,7 @@ class MainActivity : AppCompatActivity() {
         builder.setMessage("A new version of the app is available. Please visit our Telegram channel to update.")
         builder.setCancelable(false) // Make the dialog not cancelable
         builder.setPositiveButton("Go to Channel") { _, _ ->
-            if (!packageManager.canRequestPackageInstalls()) {
-                requestInstallPackagesPermission()
-            } else {
-                redirectToChannel(channelUrl)
-            }
-        }
-        builder.setNegativeButton("Later") { dialog, _ ->
-            dialog.dismiss() // Allow the user to continue using the app without updating immediately
+            redirectToChannel(channelUrl) // Directly redirect to the channel
         }
         builder.show()
     }
