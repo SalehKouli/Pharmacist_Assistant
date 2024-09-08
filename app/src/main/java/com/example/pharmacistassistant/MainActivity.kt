@@ -150,18 +150,26 @@ class MainActivity : AppCompatActivity() {
                         val versionInfo = Gson().fromJson(responseBody, VersionInfo::class.java)
                         if (versionInfo.versionCode > currentVersionCode) {
                             Log.d("MainActivity", "New version available: ${versionInfo.versionCode}")
-                            onResult(true, versionInfo.apkUrl)
+                            runOnUiThread { // Execute on main thread
+                                onResult(true, versionInfo.apkUrl)
+                            }
                         } else {
                             Log.d("MainActivity", "No update needed. Current version: $currentVersionCode")
-                            onResult(false, null)
+                            runOnUiThread {
+                                onResult(false, null)
+                            }
                         }
                     } catch (e: JsonSyntaxException) {
                         Log.e("MainActivity", "JSON parsing error", e)
-                        onResult(false, null)
+                        runOnUiThread {
+                            onResult(false, null)
+                        }
                     }
                 } ?: run {
                     Log.e("MainActivity", "Response body is null")
-                    onResult(false, null)
+                    runOnUiThread {
+                        onResult(false, null)
+                    }
                 }
             }
         })
