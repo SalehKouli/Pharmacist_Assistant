@@ -24,7 +24,4 @@
     <string name="update_message">يتوفر إصدار جديد من التطبيق. يرجى زيارة قناة التيليغرام الخاصة بنا للحصول على أحدث إصدار.</string>
     <string name="go_to_channel">الذهاب إلى القناة</string>
     <string name="settings">الإعدادات</string>
-    <string name="change_language">تغيير اللغة</string>
-    <string name="english">الإنجليزية</string>
-    <string name="arabic">العربية</string>
 </resources>
