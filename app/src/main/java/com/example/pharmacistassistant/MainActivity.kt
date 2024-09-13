@@ -1,7 +1,9 @@
 package com.example.pharmacistassistant
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -21,11 +23,15 @@ import androidx.core.content.ContextCompat
 import com.example.pharmacistassistant.ui.theme.PharmacistAssistantTheme
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
-import okhttp3.*
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
@@ -36,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     private var scannedBarcode by mutableStateOf("")
     private var lastScanTime by mutableLongStateOf(0L)
+    private lateinit var sharedPreferences: SharedPreferences
 
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
         if (result.contents == null) {
@@ -46,11 +53,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Register for result when requesting the install packages permission
     private val installPackagesPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
-        checkForAppUpdate() // Retry update check if the permission is granted
+        checkForAppUpdate()
     }
 
     private fun updateScannedBarcode(barcode: String) {
@@ -63,7 +69,8 @@ class MainActivity : AppCompatActivity() {
                     productViewModel = productViewModel,
                     scannedBarcode = scannedBarcode,
                     lastScanTime = lastScanTime,
-                    onScanButtonClick = { checkAndRequestCameraPermission() }
+                    onScanButtonClick = { checkAndRequestCameraPermission() },
+                    sharedPreferences = sharedPreferences
                 )
             }
         }
@@ -74,18 +81,20 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "onCreate called")
         Log.d("MainActivity", "Initial scannedBarcode: $scannedBarcode")
 
+        sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+
         setContent {
             PharmacistAssistantTheme {
                 MainScreen(
                     productViewModel = productViewModel,
                     scannedBarcode = scannedBarcode,
                     lastScanTime = lastScanTime,
-                    onScanButtonClick = { checkAndRequestCameraPermission() }
+                    onScanButtonClick = { checkAndRequestCameraPermission() },
+                    sharedPreferences = sharedPreferences
                 )
             }
         }
 
-        // Check for app updates
         checkForAppUpdate()
     }
 
@@ -110,7 +119,8 @@ class MainActivity : AppCompatActivity() {
             .setCameraId(0)
             .setBeepEnabled(false)
             .setBarcodeImageEnabled(true)
-            .setOrientationLocked(false)
+            .setOrientationLocked(true)
+            .setCaptureActivity(YourPortraitCaptureActivity::class.java)
 
         barcodeLauncher.launch(options)
     }
@@ -145,12 +155,12 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 response.body?.string()?.let { responseBody ->
-                    Log.d("MainActivity", "Received version.json: $responseBody") // Log raw JSON response
+                    Log.d("MainActivity", "Received version.json: $responseBody")
                     try {
                         val versionInfo = Gson().fromJson(responseBody, VersionInfo::class.java)
                         if (versionInfo.versionCode > currentVersionCode) {
                             Log.d("MainActivity", "New version available: ${versionInfo.versionCode}")
-                            runOnUiThread { // Execute on main thread
+                            runOnUiThread {
                                 onResult(true, versionInfo.apkUrl)
                             }
                         } else {
@@ -179,9 +189,9 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(getString(R.string.update_available))
         builder.setMessage(getString(R.string.update_message))
-        builder.setCancelable(false) // Make the dialog not cancelable
+        builder.setCancelable(false)
         builder.setPositiveButton(getString(R.string.go_to_channel)) { _, _ ->
-            redirectToChannel(channelUrl) // Directly redirect to the channel
+            redirectToChannel(channelUrl)
         }
         builder.show()
     }

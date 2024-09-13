@@ -25,13 +25,14 @@ fun TopBarWithSearch(
     onQueryChange: (String) -> Unit,
     isDropdownVisible: Boolean,
     searchResults: List<ProductData>,
-    onDropdownItemSelected: (ProductData) -> Unit
+    onDropdownItemSelected: (ProductData) -> Unit,
+    onNavigationClick: () -> Unit
 ) {
     Column {
         TopAppBar(
             title = { Text(stringResource(id = R.string.app_name)) },
             navigationIcon = {
-                IconButton(onClick = { /* Implement as needed */ }) {
+                IconButton(onClick = onNavigationClick) {
                     Icon(imageVector = Icons.Filled.Menu, contentDescription = stringResource(id = R.string.app_name))
                 }
             }

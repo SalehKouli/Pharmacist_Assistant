@@ -1,6 +1,7 @@
-// BottomSheetContent.kt
 package com.example.pharmacistassistant
 
+import android.content.SharedPreferences
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BottomSheetContent(columnSelection: MutableState<Map<Int, Boolean>>) {
+fun BottomSheetContent(columnSelection: MutableState<Map<Int, Boolean>>, sharedPreferences: SharedPreferences) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -31,7 +32,14 @@ fun BottomSheetContent(columnSelection: MutableState<Map<Int, Boolean>>) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 8.dp)
+                    .clickable {
+                        val currentChecked = columnSelection.value[columnName] ?: true
+                        columnSelection.value = columnSelection.value.toMutableMap().apply {
+                            this[columnName] = !currentChecked
+                        }
+                        sharedPreferences.edit().putBoolean(columnName.toString(), !currentChecked).apply()
+                    },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
@@ -40,6 +48,7 @@ fun BottomSheetContent(columnSelection: MutableState<Map<Int, Boolean>>) {
                         columnSelection.value = columnSelection.value.toMutableMap().apply {
                             this[columnName] = isChecked
                         }
+                        sharedPreferences.edit().putBoolean(columnName.toString(), isChecked).apply()
                     }
                 )
                 Text(
