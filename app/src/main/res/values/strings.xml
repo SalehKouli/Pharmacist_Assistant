@@ -29,4 +29,5 @@
     <string name="username_content_description">أدخل اسم المستخدم</string>
     <string name="location_content_description">أدخل المحافظة</string>
     <string name="submit">المتابعة</string>
+    <string name="fill_all_fields">يرجى القيام بتعبئة جميع الفراغات</string>
 </resources>

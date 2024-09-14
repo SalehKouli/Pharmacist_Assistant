@@ -10,7 +10,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -24,8 +23,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.pharmacistassistant.ui.theme.PharmacistAssistantTheme
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
@@ -121,7 +123,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showUserInfoDialog() {
-        UserInfoDialogFragment().show(supportFragmentManager, "userInfoDialog")
+        val dialogFragment = UserInfoDialogFragment()
+        dialogFragment.isCancelable = false
+        dialogFragment.show(supportFragmentManager, "userInfoDialog")
     }
 
     private fun setupPeriodicWorkRequest() {
@@ -275,10 +279,19 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton(getString(R.string.submit)) { _, _ ->
                     val username = usernameEditText.text.toString()
                     val location = locationEditText.text.toString()
-                    saveUserInfo(username, location)
+                    if (username.isNotBlank() && location.isNotBlank()) {
+                        saveUserInfo(username, location)
+                        dismiss()
+                    } else {
+                        Toast.makeText(context, getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
+                    }
                 }
 
-            return builder.create()
+            val dialog = builder.create()
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.setCancelable(false)
+
+            return dialog
         }
 
         private fun saveUserInfo(username: String, location: String) {
