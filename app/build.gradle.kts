@@ -105,6 +105,9 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.androidx.compose.material3)
     implementation(libs.material.icons.extended)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.sqlite.ktx)
+    implementation(libs.material)
 
     // Testing libraries
     testImplementation(libs.junit)

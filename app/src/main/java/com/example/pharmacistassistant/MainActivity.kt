@@ -1,6 +1,7 @@
 package com.example.pharmacistassistant
 
 import android.Manifest
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -9,6 +10,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +23,9 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
+import androidx.work.*
+import androidx.work.NetworkType
 import com.example.pharmacistassistant.ui.theme.PharmacistAssistantTheme
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
@@ -33,6 +39,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -96,6 +103,41 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkForAppUpdate()
+
+        if (isFirstLaunch()) {
+            showUserInfoDialog()
+        }
+
+        setupPeriodicWorkRequest()
+    }
+
+    private fun isFirstLaunch(): Boolean {
+        val prefs = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val isFirstLaunch = prefs.getBoolean("isFirstLaunch", true)
+        if (isFirstLaunch) {
+            prefs.edit().putBoolean("isFirstLaunch", false).apply()
+        }
+        return isFirstLaunch
+    }
+
+    private fun showUserInfoDialog() {
+        UserInfoDialogFragment().show(supportFragmentManager, "userInfoDialog")
+    }
+
+    private fun setupPeriodicWorkRequest() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<UserDataWorker>(1, TimeUnit.DAYS)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork(
+            "userDataSubmission",
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicWorkRequest
+        )
     }
 
     private fun checkAndRequestCameraPermission() {
@@ -217,6 +259,31 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    class UserInfoDialogFragment : DialogFragment() {
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            val builder = AlertDialog.Builder(requireActivity())
+            val inflater = requireActivity().layoutInflater
+            val view = inflater.inflate(R.layout.dialog_user_info, null)
+
+            val usernameEditText = view.findViewById<EditText>(R.id.usernameEditText)
+            val locationEditText = view.findViewById<EditText>(R.id.locationEditText)
+
+            builder.setView(view)
+                .setPositiveButton(getString(R.string.submit)) { _, _ ->
+                    val username = usernameEditText.text.toString()
+                    val location = locationEditText.text.toString()
+                    saveUserInfo(username, location)
+                }
+
+            return builder.create()
+        }
+
+        private fun saveUserInfo(username: String, location: String) {
+            val userDatabase = UserDatabase(requireContext())
+            userDatabase.insertUser(username, location)
         }
     }
 

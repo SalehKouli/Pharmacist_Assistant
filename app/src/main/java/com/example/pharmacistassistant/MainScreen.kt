@@ -170,7 +170,6 @@ fun MainScreen(
                             productViewModel.resetSearch()
                             query = ""
                             productViewModel.updateSelectedProducts(emptyList())
-                            columnSelection.value = getInitialColumnSelection().toMutableMap()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
