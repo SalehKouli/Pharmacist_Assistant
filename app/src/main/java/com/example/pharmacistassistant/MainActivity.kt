@@ -31,6 +31,7 @@ import androidx.work.WorkManager
 import com.example.pharmacistassistant.ui.theme.PharmacistAssistantTheme
 import com.example.pharmacistassistant.viewmodel.ProductViewModel
 import com.example.pharmacistassistant.viewmodel.ProductViewModelFactory
+import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.journeyapps.barcodescanner.ScanContract
@@ -274,22 +275,24 @@ class MainActivity : AppCompatActivity() {
 
             val usernameEditText = view.findViewById<EditText>(R.id.usernameEditText)
             val locationEditText = view.findViewById<EditText>(R.id.locationEditText)
+            val submitButton = view.findViewById<MaterialButton>(R.id.submitButton)
+
+            submitButton.setOnClickListener {
+                val username = usernameEditText.text.toString()
+                val location = locationEditText.text.toString()
+                if (username.isNotBlank() && location.isNotBlank()) {
+                    saveUserInfo(username, location)
+                    dismiss()  // Close the dialog
+                } else {
+                    Toast.makeText(context, getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
+                }
+            }
 
             builder.setView(view)
-                .setPositiveButton(getString(R.string.submit)) { _, _ ->
-                    val username = usernameEditText.text.toString()
-                    val location = locationEditText.text.toString()
-                    if (username.isNotBlank() && location.isNotBlank()) {
-                        saveUserInfo(username, location)
-                        dismiss()
-                    } else {
-                        Toast.makeText(context, getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
-                    }
-                }
 
             val dialog = builder.create()
-            dialog.setCanceledOnTouchOutside(false)
-            dialog.setCancelable(false)
+            dialog.setCanceledOnTouchOutside(false)  // Prevent dismissing by touching outside
+            dialog.setCancelable(false)  // Prevent dismissing by pressing back
 
             return dialog
         }
