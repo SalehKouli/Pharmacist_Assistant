@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">مساعد الصيدلي</string>
+    <string name="app_name">الصيدلية الذكية</string>
     <string name="no_scan_result">لا توجد نتيجة مسح</string>
     <string name="barcode">الباركود</string>
     <string name="trade_name">الاسم التجاري</string>
@@ -30,5 +30,5 @@
     <string name="location_content_description">أدخل المحافظة</string>
     <string name="submit">المتابعة</string>
     <string name="fill_all_fields">يرجى القيام بتعبئة جميع الفراغات</string>
-    <string name="user_info_title">مرحباً بك في تطبيق مساعد الصيدلي!</string>
+    <string name="user_info_title">أهلاً بك في الصيدلية الذكية!</string>
 </resources>

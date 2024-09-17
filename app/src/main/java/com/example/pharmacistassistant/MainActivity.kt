@@ -93,6 +93,17 @@ class MainActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
 
+        if (shouldShowUserInfoDialog()) {
+            showUserInfoDialog()
+        } else {
+            initializeApp()
+        }
+
+        checkForAppUpdate()
+        setupPeriodicWorkRequest()
+    }
+
+    private fun initializeApp() {
         setContent {
             PharmacistAssistantTheme {
                 MainScreen(
@@ -104,29 +115,22 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-
-        checkForAppUpdate()
-
-        if (isFirstLaunch()) {
-            showUserInfoDialog()
-        }
-
-        setupPeriodicWorkRequest()
     }
 
-    private fun isFirstLaunch(): Boolean {
-        val prefs = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
-        val isFirstLaunch = prefs.getBoolean("isFirstLaunch", true)
-        if (isFirstLaunch) {
-            prefs.edit().putBoolean("isFirstLaunch", false).apply()
-        }
-        return isFirstLaunch
+    private fun shouldShowUserInfoDialog(): Boolean {
+        val userDatabase = UserDatabase(this)
+        val users = userDatabase.getUsers()
+        return users.isEmpty()
     }
 
     private fun showUserInfoDialog() {
         val dialogFragment = UserInfoDialogFragment()
         dialogFragment.isCancelable = false
         dialogFragment.show(supportFragmentManager, "userInfoDialog")
+    }
+
+    fun onUserInfoSubmitted() {
+        initializeApp()
     }
 
     private fun setupPeriodicWorkRequest() {
@@ -282,7 +286,8 @@ class MainActivity : AppCompatActivity() {
                 val location = locationEditText.text.toString()
                 if (username.isNotBlank() && location.isNotBlank()) {
                     saveUserInfo(username, location)
-                    dismiss()  // Close the dialog
+                    dismiss()
+                    (activity as? MainActivity)?.onUserInfoSubmitted()
                 } else {
                     Toast.makeText(context, getString(R.string.fill_all_fields), Toast.LENGTH_SHORT).show()
                 }
@@ -291,8 +296,8 @@ class MainActivity : AppCompatActivity() {
             builder.setView(view)
 
             val dialog = builder.create()
-            dialog.setCanceledOnTouchOutside(false)  // Prevent dismissing by touching outside
-            dialog.setCancelable(false)  // Prevent dismissing by pressing back
+            dialog.setCanceledOnTouchOutside(false)
+            dialog.setCancelable(false)
 
             return dialog
         }
