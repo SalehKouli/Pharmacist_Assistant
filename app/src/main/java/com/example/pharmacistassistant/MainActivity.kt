@@ -273,7 +273,7 @@ class MainActivity : AppCompatActivity() {
 
     class UserInfoDialogFragment : DialogFragment() {
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val builder = AlertDialog.Builder(requireActivity())
+            val builder = AlertDialog.Builder(requireActivity(), R.style.AppTheme_Dialog)
             val inflater = requireActivity().layoutInflater
             val view = inflater.inflate(R.layout.dialog_user_info, null)
 
