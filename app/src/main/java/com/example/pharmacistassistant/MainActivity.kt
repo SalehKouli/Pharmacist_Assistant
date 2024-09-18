@@ -80,7 +80,8 @@ class MainActivity : AppCompatActivity() {
                     scannedBarcode = scannedBarcode,
                     lastScanTime = lastScanTime,
                     onScanButtonClick = { checkAndRequestCameraPermission() },
-                    sharedPreferences = sharedPreferences
+                    sharedPreferences = sharedPreferences,
+                    openTelegramBot = { openTelegramBot() }
                 )
             }
         }
@@ -111,7 +112,8 @@ class MainActivity : AppCompatActivity() {
                     scannedBarcode = scannedBarcode,
                     lastScanTime = lastScanTime,
                     onScanButtonClick = { checkAndRequestCameraPermission() },
-                    sharedPreferences = sharedPreferences
+                    sharedPreferences = sharedPreferences,
+                    openTelegramBot = { openTelegramBot() }
                 )
             }
         }
@@ -307,6 +309,13 @@ class MainActivity : AppCompatActivity() {
             userDatabase.insertUser(username, location)
         }
     }
+
+    private fun openTelegramBot() {
+        val telegramBotUrl = "https://t.me/SmartPharmacyContactBot"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(telegramBotUrl))
+        startActivity(intent)
+    }
+
 
     companion object {
         private const val CAMERA_PERMISSION_REQUEST_CODE = 100

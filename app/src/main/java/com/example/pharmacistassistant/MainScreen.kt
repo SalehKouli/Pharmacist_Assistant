@@ -46,7 +46,8 @@ fun MainScreen(
     scannedBarcode: String,
     lastScanTime: Long,
     onScanButtonClick: () -> Unit,
-    sharedPreferences: SharedPreferences
+    sharedPreferences: SharedPreferences,
+    openTelegramBot: () -> Unit
 ) {
     val searchResults by productViewModel.searchResults.collectAsState()
     var query by remember { mutableStateOf("") }
@@ -78,6 +79,12 @@ fun MainScreen(
             ModalDrawerSheet {
                 Text(stringResource(R.string.settings), modifier = Modifier.padding(16.dp))
                 HorizontalDivider()
+                Text(
+                    text = stringResource(R.string.contact_telegram),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .clickable { openTelegramBot() }
+                )
             }
         }
     ) {
