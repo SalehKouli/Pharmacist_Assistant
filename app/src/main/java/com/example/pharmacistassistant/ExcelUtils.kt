@@ -14,7 +14,7 @@ data class ProductData(
     val size: String,
     val factory: String,
     val commonsPrice: String,
-    val quantityAvailable: String,
+    /*val quantityAvailable: String,*/
     val wholesalePrice: String,
     val purchasePrice: String
 )
@@ -39,7 +39,7 @@ fun readExcelFile(context: Context, fileName: String): List<ProductData> {
             // Extracting cell data based on the column order
             val purchasePrice = row.getCell(0).toString() // Column A
             val wholesalePrice = row.getCell(1).toString() // Column B
-            val quantityAvailable = row.getCell(2).toString() // Column C
+            /*val quantityAvailable = row.getCell(2).toString() // Column C */
             val commonsPrice = row.getCell(3).toString() // Column D
             val factory = row.getCell(4).toString() // Column E
             val size = row.getCell(5).toString() // Column F
@@ -64,7 +64,7 @@ fun readExcelFile(context: Context, fileName: String): List<ProductData> {
                 size = size,
                 factory = factory,
                 commonsPrice = commonsPrice,
-                quantityAvailable = quantityAvailable,
+                /*quantityAvailable = quantityAvailable,*/
                 wholesalePrice = wholesalePrice,
                 purchasePrice = purchasePrice
             )

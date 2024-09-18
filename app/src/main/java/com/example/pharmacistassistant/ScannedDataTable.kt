@@ -87,14 +87,14 @@ fun ScannedDataTable(
                             .padding(horizontal = 4.dp)
                     )
                 }
-                if (selectedColumns[R.string.quantity_available] == true) {
+                /*if (selectedColumns[R.string.quantity_available] == true) {
                     Text(
                         text = stringResource(id = R.string.quantity_available),
                         modifier = Modifier
                             .width(150.dp)
                             .padding(horizontal = 4.dp)
                     )
-                }
+                }*/
                 if (selectedColumns[R.string.wholesale_price] == true) {
                     Text(
                         text = stringResource(id = R.string.wholesale_price),
@@ -177,14 +177,14 @@ fun ScannedDataTable(
                             .padding(horizontal = 4.dp)
                     )
                 }
-                if (selectedColumns[R.string.quantity_available] == true) {
+                /*if (selectedColumns[R.string.quantity_available] == true) {
                     Text(
                         text = data.quantityAvailable,
                         modifier = Modifier
                             .width(150.dp)
                             .padding(horizontal = 4.dp)
                     )
-                }
+                }*/
                 if (selectedColumns[R.string.wholesale_price] == true) {
                     Text(
                         text = data.wholesalePrice,

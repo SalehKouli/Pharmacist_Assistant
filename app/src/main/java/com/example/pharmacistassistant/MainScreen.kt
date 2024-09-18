@@ -79,12 +79,14 @@ fun MainScreen(
             ModalDrawerSheet {
                 Text(stringResource(R.string.settings), modifier = Modifier.padding(16.dp))
                 HorizontalDivider()
-                Text(
-                    text = stringResource(R.string.contact_telegram),
+                Box(
                     modifier = Modifier
-                        .padding(16.dp)
+                        .fillMaxWidth()
                         .clickable { openTelegramBot() }
-                )
+                        .padding(16.dp)
+                ) {
+                    Text(text = stringResource(R.string.contact_telegram))
+                }
             }
         }
     ) {
